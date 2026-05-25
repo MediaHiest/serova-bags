@@ -24,18 +24,18 @@ export default async function AdminDashboardPage() {
     totalProducts,
     totalOrders,
     pendingOrders,
-    totalUsers,
     recentOrders,
     lowStock,
     totalRevenueAgg,
     paidRevenueAgg,
     monthRevenueAgg,
     monthOrderCount,
+    newInquiries,
+    totalUsers,
   ] = await Promise.all([
       prisma.product.count(),
       prisma.order.count(),
       prisma.order.count({ where: { status: "PENDING" } }),
-      prisma.user.count(),
       prisma.order.findMany({
         take: 5,
         orderBy: { createdAt: "desc" },
@@ -62,6 +62,8 @@ export default async function AdminDashboardPage() {
       prisma.order.count({
         where: { ...revenueWhere, createdAt: { gte: startOfMonth } },
       }),
+      prisma.contactInquiry.count({ where: { status: "NEW" } }),
+      prisma.user.count(),
     ]);
 
   const totalRevenue = decimalToNumber(totalRevenueAgg._sum.total ?? 0);
@@ -74,6 +76,7 @@ export default async function AdminDashboardPage() {
     { label: "Total Products", value: String(totalProducts) },
     { label: "Total Orders", value: String(totalOrders) },
     { label: "Pending Orders", value: String(pendingOrders) },
+    { label: "New Inquiries", value: String(newInquiries), href: "/admin/inquiries" },
     { label: "Total Users", value: String(totalUsers) },
   ];
 
@@ -96,11 +99,17 @@ export default async function AdminDashboardPage() {
     <div>
       <h1 className="text-xl sm:text-2xl font-medium text-text-dark mb-6 sm:mb-8">Dashboard Overview</h1>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
         {stats.map((stat) => (
           <div key={stat.label} className="admin-card">
             <p className="text-xs sm:text-sm text-text-muted">{stat.label}</p>
-            <p className="text-2xl sm:text-3xl font-light text-text-dark mt-1">{stat.value}</p>
+            {"href" in stat && stat.href ? (
+              <Link href={stat.href} className="text-2xl sm:text-3xl font-light text-text-dark mt-1 block hover:opacity-70">
+                {stat.value}
+              </Link>
+            ) : (
+              <p className="text-2xl sm:text-3xl font-light text-text-dark mt-1">{stat.value}</p>
+            )}
           </div>
         ))}
       </div>

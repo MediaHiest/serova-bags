@@ -113,6 +113,18 @@ export const paymentStatusSchema = z.object({
   paymentStatus: z.enum(["UNPAID", "PAID", "REFUNDED"]),
 });
 
+export const contactInquirySchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
+  subject: z.string().min(1, "Subject is required"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+export const inquiryStatusSchema = z.object({
+  status: z.enum(["NEW", "READ", "RESOLVED"]),
+});
+
 export const productQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(48).default(12),
