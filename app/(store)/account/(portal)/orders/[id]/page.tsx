@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
+import { ShippingFeeLabel } from "@/components/store/ShippingFeeHint";
 import AccountPageHeader from "@/components/store/account/AccountPageHeader";
 import AccountLoading from "@/components/store/account/AccountLoading";
 import OrderStatusBadge from "@/components/store/account/OrderStatusBadge";
@@ -133,13 +134,13 @@ export default function OrderDetailPage() {
               <span className="text-text-muted">Subtotal</span>
               <span>{formatPrice(order.subtotal as number)} EGP</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-sm items-start gap-3">
               <span className="text-text-muted">Shipping</span>
-              <span>
-                {(order.shippingFee as number) === 0
-                  ? "Free"
-                  : `${formatPrice(order.shippingFee as number)} EGP`}
-              </span>
+              {(order.shippingFee as number) === 0 ? (
+                <ShippingFeeLabel />
+              ) : (
+                <span>{formatPrice(order.shippingFee as number)} EGP</span>
+              )}
             </div>
             <div className="flex justify-between font-medium pt-3 border-t border-text-dark/10">
               <span>Total</span>

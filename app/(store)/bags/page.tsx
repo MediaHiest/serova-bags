@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import ProductListing from "@/components/store/ProductListing";
 import { prisma } from "@/lib/prisma";
-import { decimalToNumber } from "@/lib/utils";
+import { decimalToNumber, getProductPrimaryImage } from "@/lib/utils";
 import type { Prisma } from "@prisma/client";
 
 interface BagsPageProps {
@@ -47,7 +47,7 @@ async function getBagProducts(page: number, sort: string) {
       orderBy,
       skip,
       take: limit,
-      include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
+      include: { colors: { orderBy: { sortOrder: "asc" }, take: 1 } },
     }),
     prisma.product.count({ where }),
   ]);
@@ -58,8 +58,7 @@ async function getBagProducts(page: number, sort: string) {
       name: p.name,
       slug: p.slug,
       price: decimalToNumber(p.price),
-      salePrice: p.salePrice ? decimalToNumber(p.salePrice) : null,
-      image: p.images[0]?.url ?? null,
+      image: getProductPrimaryImage(p.colors),
     })),
     pagination: { page, totalPages: Math.ceil(total / limit) || 1 },
   };

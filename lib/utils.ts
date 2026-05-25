@@ -18,16 +18,6 @@ export function generateOrderNumber(): string {
   return `ORD-${date}-${random}`;
 }
 
-export const FREE_SHIPPING_THRESHOLD = 5000;
-
-export function calculateCartShippingFee(
-  items: { quantity: number; shippingPrice: number }[],
-  subtotal: number
-): number {
-  if (subtotal >= FREE_SHIPPING_THRESHOLD) return 0;
-  return items.reduce((sum, item) => sum + item.shippingPrice * item.quantity, 0);
-}
-
 export function formatPrice(amount: number | string): string {
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   return new Intl.NumberFormat("en-EG", {
@@ -37,18 +27,14 @@ export function formatPrice(amount: number | string): string {
   }).format(num);
 }
 
-export function getEffectivePrice(
-  price: number | { toString(): string },
-  salePrice?: number | { toString(): string } | null
-): number {
-  const base = parseFloat(price.toString());
-  if (salePrice != null) {
-    const sale = parseFloat(salePrice.toString());
-    if (sale > 0 && sale < base) return sale;
-  }
-  return base;
-}
-
 export function decimalToNumber(value: { toString(): string }): number {
   return parseFloat(value.toString());
+}
+
+export function getProductPrimaryImage(
+  colors: { imageUrl: string; sortOrder: number }[] | null | undefined
+): string | null {
+  if (!colors?.length) return null;
+  const sorted = [...colors].sort((a, b) => a.sortOrder - b.sortOrder);
+  return sorted[0]?.imageUrl ?? null;
 }

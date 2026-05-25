@@ -58,9 +58,9 @@ export default function AdminCategoriesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-medium text-text-dark">Categories</h1>
-        <button className="btn-primary text-xs py-2 px-4" onClick={() => { setEditingId(null); setShowForm(true); }}>
+      <div className="admin-page-header">
+        <h1 className="text-xl sm:text-2xl font-medium text-text-dark">Categories</h1>
+        <button className="btn-primary text-xs py-2 px-4 shrink-0" onClick={() => { setEditingId(null); setShowForm(true); }}>
           Add Category
         </button>
       </div>
@@ -81,8 +81,8 @@ export default function AdminCategoriesPage() {
         </form>
       )}
 
-      <div className="admin-card">
-        <table className="w-full text-sm">
+      <div className="admin-card overflow-x-auto -mx-4 sm:mx-0 rounded-none sm:rounded-lg px-4 sm:px-0">
+        <table className="w-full text-sm min-w-[520px]">
           <thead>
             <tr className="border-b text-left text-text-muted">
               <th className="pb-3 pr-4">Name</th>

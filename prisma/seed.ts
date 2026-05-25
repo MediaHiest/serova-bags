@@ -78,7 +78,6 @@ const products = [
     description:
       "Elegant mini clutch for evening occasions. Sleek silhouette with enough room for essentials.",
     price: 1800,
-    salePrice: 1500,
     stock: 20,
     isFeatured: false,
     isPublished: true,
@@ -221,8 +220,8 @@ async function main() {
     const categoryId = categoryMap[p.categorySlug];
     if (!categoryId) continue;
 
-    const { categorySlug, ...productData } = p;
-    const data = { ...productData, categoryId, shippingPrice: 150 };
+    const { categorySlug, color, ...productData } = p;
+    const data = { ...productData, categoryId };
 
     const product = await prisma.product.upsert({
       where: { slug: p.slug },
@@ -230,18 +229,21 @@ async function main() {
       create: data,
     });
 
-    const existingImages = await prisma.productImage.count({
+    const existingColors = await prisma.productColor.count({
       where: { productId: product.id },
     });
 
-    if (existingImages === 0) {
-      await prisma.productImage.create({
-        data: {
-          productId: product.id,
-          url: bagImages[i % bagImages.length],
-          altText: p.name,
-          sortOrder: 0,
-        },
+    if (existingColors === 0) {
+      const colorVariants =
+        i === 0
+          ? [
+              { name: "Beige", imageUrl: bagImages[0], sortOrder: 0 },
+              { name: "Black", imageUrl: bagImages[1], sortOrder: 1 },
+            ]
+          : [{ name: color, imageUrl: bagImages[i % bagImages.length], sortOrder: 0 }];
+
+      await prisma.productColor.createMany({
+        data: colorVariants.map((c) => ({ ...c, productId: product.id })),
       });
     }
   }

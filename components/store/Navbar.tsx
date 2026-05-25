@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
+import BrandLogo from "@/components/store/BrandLogo";
+import LogoutButton from "@/components/store/LogoutButton";
 
 const navLinks = [
   { href: "/shop", label: "Shop All" },
@@ -11,6 +13,12 @@ const navLinks = [
   { href: "/shop?category=clothing", label: "Clothing" },
   { href: "/shop?category=accessories", label: "Accessories" },
   { href: "/shop?category=sale", label: "Sale" },
+];
+
+const mobileMenuLinks = [
+  { href: "/shop", label: "Shop All" },
+  { href: "/bags", label: "Bags" },
+  { href: "/our-story", label: "Our Story" },
 ];
 
 function IconSearch() {
@@ -42,7 +50,15 @@ function IconCart() {
   );
 }
 
-function NavLink({ href, label }: { href: string; label: string }) {
+function NavLink({
+  href,
+  label,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  onClick?: () => void;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -57,23 +73,55 @@ function NavLink({ href, label }: { href: string; label: string }) {
   })();
 
   return (
-    <Link href={href} className={`site-nav-link ${isActive ? "site-nav-link-active" : ""}`}>
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`site-nav-link ${isActive ? "site-nav-link-active" : ""}`}
+    >
       {label}
     </Link>
   );
 }
 
 function NavbarContent() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname, searchParams]);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => setIsLoggedIn(res.ok))
+      .catch(() => setIsLoggedIn(false));
+  }, [pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  function closeMobileMenu() {
+    setMobileOpen(false);
+  }
 
   return (
     <header className="site-header sticky top-0 z-50">
-      <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-14">
-        {/* Desktop — single row: logo | nav | utilities */}
-        <div className="hidden lg:block site-nav-inner">
-          <Link href="/" className="site-nav-logo hover:opacity-85 transition-opacity">
-            Selora Brand
-          </Link>
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14">
+        {/* Desktop */}
+        <div className="hidden lg:grid site-nav-inner w-full">
+          <BrandLogo
+            variant="navbar"
+            href="/"
+            className="site-nav-logo logo-blend-screen hover:opacity-85 transition-opacity"
+            imageClassName="h-9 lg:h-10 w-auto max-w-[200px]"
+            priority
+          />
 
           <nav className="site-nav-links" aria-label="Main navigation">
             {navLinks.map((link) => (
@@ -107,61 +155,107 @@ function NavbarContent() {
         </div>
 
         {/* Mobile */}
-        <div className="lg:hidden flex items-center justify-between min-h-[4rem] py-3">
-          <button
-            type="button"
-            className="site-nav-icon p-1"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25">
-              {mobileOpen ? (
-                <path d="M6 6l12 12M18 6L6 18" />
-              ) : (
-                <>
-                  <path d="M4 7h16M4 12h16M4 17h16" />
-                </>
-              )}
-            </svg>
-          </button>
-
-          <Link href="/" className="site-nav-logo text-[1.6rem]">
-            Selora Brand
-          </Link>
-
-          <div className="site-nav-icons">
-            <Link href="/account" className="site-nav-icon" aria-label="Account">
-              <IconUser />
-            </Link>
-            <Link href="/cart" className="site-nav-icon" aria-label="Cart">
-              <IconCart />
-            </Link>
-          </div>
-        </div>
-
-        {mobileOpen && (
-          <nav
-            className="lg:hidden pb-6 flex flex-col items-center gap-4 border-t border-text-dark/10 pt-5"
-            aria-label="Mobile navigation"
-          >
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="site-nav-link"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <button type="button" className="site-nav-locale">
-              English
-              <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor">
-                <path d="M2 3.5L5 6.5L8 3.5" />
+        <div className="lg:hidden relative">
+          <div className="grid grid-cols-[2.5rem_1fr_auto] items-center min-h-[4rem] py-3 gap-2">
+            <button
+              type="button"
+              className="site-nav-icon p-1 justify-self-start"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25">
+                {mobileOpen ? (
+                  <path d="M6 6l12 12M18 6L6 18" />
+                ) : (
+                  <>
+                    <path d="M4 7h16M4 12h16M4 17h16" />
+                  </>
+                )}
               </svg>
             </button>
-          </nav>
-        )}
+
+            <BrandLogo
+              variant="navbar"
+              href="/"
+              className="site-nav-logo logo-blend-screen justify-self-center"
+              imageClassName="h-8 w-auto max-w-[140px] sm:max-w-[160px]"
+              priority
+            />
+
+            <div className="site-nav-icons justify-self-end">
+              <Link href="/account" className="site-nav-icon" aria-label="Account">
+                <IconUser />
+              </Link>
+              <Link href="/cart" className="site-nav-icon" aria-label="Cart">
+                <IconCart />
+              </Link>
+            </div>
+          </div>
+
+          {mobileOpen && (
+            <>
+              <button
+                type="button"
+                className="fixed inset-0 top-[4rem] bg-black/20 z-40"
+                aria-label="Close menu"
+                onClick={closeMobileMenu}
+              />
+              <nav
+                className="absolute left-0 right-0 top-full z-50 border-t border-text-dark/10 bg-bg-beige shadow-lg"
+                aria-label="Mobile navigation"
+              >
+                <div className="px-4 py-5 flex flex-col items-center gap-4">
+                  {mobileMenuLinks.map((link) => (
+                    <NavLink key={link.href} {...link} onClick={closeMobileMenu} />
+                  ))}
+                  <div className="w-full border-t border-text-dark/10 pt-4 mt-1 flex flex-col items-center gap-4">
+                    {isLoggedIn === true && (
+                      <>
+                        <Link
+                          href="/account"
+                          className="site-nav-link"
+                          onClick={closeMobileMenu}
+                        >
+                          Account
+                        </Link>
+                        <LogoutButton
+                          label="Logout"
+                          className="site-nav-link"
+                          onLoggedOut={closeMobileMenu}
+                        />
+                      </>
+                    )}
+                    {isLoggedIn === false && (
+                      <>
+                        <Link
+                          href="/account/login"
+                          className="site-nav-link"
+                          onClick={closeMobileMenu}
+                        >
+                          Login
+                        </Link>
+                        <Link
+                          href="/account/register"
+                          className="site-nav-link"
+                          onClick={closeMobileMenu}
+                        >
+                          Register
+                        </Link>
+                      </>
+                    )}
+                    <button type="button" className="site-nav-locale">
+                      English
+                      <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor">
+                        <path d="M2 3.5L5 6.5L8 3.5" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </nav>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
@@ -169,7 +263,7 @@ function NavbarContent() {
 
 export default function Navbar() {
   return (
-    <Suspense fallback={<header className="site-header h-[4.5rem]" />}>
+    <Suspense fallback={<header className="site-header h-[4rem] lg:h-[4.5rem]" />}>
       <NavbarContent />
     </Suspense>
   );

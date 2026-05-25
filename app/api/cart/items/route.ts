@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { requireUser, jsonError, jsonSuccess } from "@/lib/api-utils";
-import { getEffectivePrice } from "@/lib/utils";
+import { decimalToNumber } from "@/lib/utils";
 import {
   getOrCreateCart,
   recalculateCartItemPrices,
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   }
 
   const cart = await getOrCreateCart(session!.sub);
-  const unitPrice = getEffectivePrice(product.price, product.salePrice);
+  const unitPrice = decimalToNumber(product.price);
 
   const existing = await prisma.cartItem.findUnique({
     where: { cartId_productId: { cartId: cart.id, productId } },

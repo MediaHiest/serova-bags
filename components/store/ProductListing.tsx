@@ -11,7 +11,6 @@ export interface ProductListItem {
   name: string;
   slug: string;
   price: number;
-  salePrice?: number | null;
   image: string | null;
 }
 
@@ -50,12 +49,12 @@ export default function ProductListing({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-      <div className="text-center mb-10">
-        <h1 className="page-title text-4xl md:text-5xl lg:text-6xl text-text-dark">{title}</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 md:py-16">
+      <div className="text-center mb-8 sm:mb-10">
+        <h1 className="page-title text-2xl sm:text-3xl md:text-5xl lg:text-6xl text-text-dark">{title}</h1>
         <div className="title-underline" />
         {subtitle && (
-          <p className="mt-6 text-base md:text-lg text-text-muted font-normal tracking-wide max-w-xl mx-auto leading-relaxed">
+          <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-text-muted font-normal tracking-wide max-w-xl mx-auto leading-relaxed px-2">
             {subtitle}
           </p>
         )}

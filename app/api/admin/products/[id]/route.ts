@@ -13,7 +13,7 @@ export async function GET(_request: Request, { params }: Params) {
   const { id } = await params;
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { images: { orderBy: { sortOrder: "asc" } }, category: true },
+    include: { colors: { orderBy: { sortOrder: "asc" } }, category: true },
   });
   if (!product) return jsonError("Product not found", 404);
 
@@ -21,8 +21,6 @@ export async function GET(_request: Request, { params }: Params) {
     product: {
       ...product,
       price: decimalToNumber(product.price),
-      salePrice: product.salePrice ? decimalToNumber(product.salePrice) : null,
-      shippingPrice: decimalToNumber(product.shippingPrice),
     },
   });
 }
@@ -41,7 +39,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const { images, ...productData } = parsed.data;
+  const { colors, ...productData } = parsed.data;
 
   if (productData.slug !== existing.slug) {
     const slugTaken = await prisma.product.findUnique({ where: { slug: productData.slug } });
@@ -49,24 +47,20 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 
   const product = await prisma.$transaction(async (tx) => {
-    if (images) {
-      await tx.productImage.deleteMany({ where: { productId: id } });
-      if (images.length > 0) {
-        await tx.productImage.createMany({
-          data: images.map((img, i) => ({
-            productId: id,
-            url: img.url,
-            altText: img.altText,
-            sortOrder: img.sortOrder ?? i,
-          })),
-        });
-      }
-    }
+    await tx.productColor.deleteMany({ where: { productId: id } });
+    await tx.productColor.createMany({
+      data: colors.map((c, i) => ({
+        productId: id,
+        name: c.name,
+        imageUrl: c.imageUrl,
+        sortOrder: c.sortOrder ?? i,
+      })),
+    });
 
     return tx.product.update({
       where: { id },
       data: productData,
-      include: { images: { orderBy: { sortOrder: "asc" } }, category: true },
+      include: { colors: { orderBy: { sortOrder: "asc" } }, category: true },
     });
   });
 
@@ -74,8 +68,6 @@ export async function PUT(request: NextRequest, { params }: Params) {
     product: {
       ...product,
       price: decimalToNumber(product.price),
-      salePrice: product.salePrice ? decimalToNumber(product.salePrice) : null,
-      shippingPrice: decimalToNumber(product.shippingPrice),
     },
   });
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandLogo from "@/components/store/BrandLogo";
 
 const ourStoryLinks = [
   { href: "/contact", label: "Contact us" },
@@ -73,14 +74,17 @@ export default function Footer() {
               ))}
             </ul>
             <h4 className="site-footer-heading mb-5">Our Stores</h4>
-            <p className="site-footer-logo text-xl opacity-90">Selora Brand</p>
+            <BrandLogo
+              variant="footer"
+              imageClassName="h-10 w-auto max-w-[200px] opacity-90"
+            />
           </div>
         </div>
 
         {/* Bottom bar — copyright + locale */}
         <div className="site-footer-bottom mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p>2026 Media Heist</p>
-          <p className="site-footer-locale flex items-center gap-3">
+          <p className="site-footer-locale flex flex-wrap items-center justify-center sm:justify-end gap-x-3 gap-y-1 text-center sm:text-right">
             <span>Egypt (EGP)</span>
             <span className="opacity-30">|</span>
             <span>English</span>
@@ -94,9 +98,11 @@ export default function Footer() {
       <div className="site-footer-watermark py-8">
         <div className="site-footer-watermark-inner px-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <span key={i} className="site-footer-logo">
-              Selora Brand
-            </span>
+            <BrandLogo
+              key={i}
+              variant="footer"
+              imageClassName="h-8 md:h-10 w-auto max-w-[180px]"
+            />
           ))}
         </div>
       </div>

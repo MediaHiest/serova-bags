@@ -45,26 +45,26 @@ export default function AdminOrdersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-medium text-text-dark mb-8">Orders</h1>
+      <h1 className="text-xl sm:text-2xl font-medium text-text-dark mb-6 sm:mb-8">Orders</h1>
 
-      <form onSubmit={handleSearch} className="flex gap-3 mb-6">
+      <form onSubmit={handleSearch} className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
         <input
-          className="input-field max-w-xs"
+          className="input-field sm:max-w-xs flex-1 min-w-0"
           placeholder="Search order number, name, email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <select className="input-field max-w-[160px]" value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select className="input-field sm:max-w-[160px] w-full sm:w-auto" value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">All Status</option>
           {["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}
         </select>
-        <button type="submit" className="btn-primary text-xs py-2 px-4">Search</button>
+        <button type="submit" className="btn-primary text-xs py-2 px-4 w-full sm:w-auto shrink-0">Search</button>
       </form>
 
-      <div className="admin-card overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="admin-card overflow-x-auto -mx-4 sm:mx-0 rounded-none sm:rounded-lg">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b text-left text-text-muted">
               <th className="pb-3 pr-4">Order #</th>

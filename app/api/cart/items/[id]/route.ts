@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { requireUser, jsonError, jsonSuccess } from "@/lib/api-utils";
-import { getEffectivePrice } from "@/lib/utils";
+import { decimalToNumber } from "@/lib/utils";
 import { getOrCreateCart, serializeCart } from "@/lib/cart-order";
 import { prisma } from "@/lib/prisma";
 import { cartItemUpdateSchema } from "@/lib/validation";
@@ -33,7 +33,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     if (quantity > item.product.stock) {
       return jsonError("Not enough items available", 400);
     }
-    const unitPrice = getEffectivePrice(item.product.price, item.product.salePrice);
+    const unitPrice = decimalToNumber(item.product.price);
     await prisma.cartItem.update({
       where: { id },
       data: { quantity, unitPrice },

@@ -1,10 +1,13 @@
 import { prisma } from "./prisma";
 import {
-  calculateCartShippingFee,
   decimalToNumber,
   generateOrderNumber,
-  getEffectivePrice,
+  getProductPrimaryImage,
 } from "./utils";
+
+const productWithColorImage = {
+  include: { colors: { orderBy: { sortOrder: "asc" as const }, take: 1 } },
+};
 
 export async function getOrCreateCart(userId: string) {
   let cart = await prisma.cart.findUnique({
@@ -12,9 +15,7 @@ export async function getOrCreateCart(userId: string) {
     include: {
       items: {
         include: {
-          product: {
-            include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
-          },
+          product: productWithColorImage,
         },
       },
     },
@@ -26,9 +27,7 @@ export async function getOrCreateCart(userId: string) {
       include: {
         items: {
           include: {
-            product: {
-              include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
-            },
+            product: productWithColorImage,
           },
         },
       },
@@ -45,7 +44,7 @@ export async function recalculateCartItemPrices(cartId: string) {
   });
 
   for (const item of items) {
-    const unitPrice = getEffectivePrice(item.product.price, item.product.salePrice);
+    const unitPrice = decimalToNumber(item.product.price);
     if (decimalToNumber(item.unitPrice) !== unitPrice) {
       await prisma.cartItem.update({
         where: { id: item.id },
@@ -57,7 +56,7 @@ export async function recalculateCartItemPrices(cartId: string) {
 
 export function serializeCart(cart: Awaited<ReturnType<typeof getOrCreateCart>>) {
   const items = cart.items.map((item) => {
-    const unitPrice = getEffectivePrice(item.product.price, item.product.salePrice);
+    const unitPrice = decimalToNumber(item.product.price);
     const lineTotal = unitPrice * item.quantity;
     return {
       id: item.id,
@@ -69,22 +68,15 @@ export function serializeCart(cart: Awaited<ReturnType<typeof getOrCreateCart>>)
         id: item.product.id,
         name: item.product.name,
         slug: item.product.slug,
-        price: decimalToNumber(item.product.price),
-        salePrice: item.product.salePrice
-          ? decimalToNumber(item.product.salePrice)
-          : null,
-        image: item.product.images[0]?.url ?? null,
+        price: unitPrice,
+        image: getProductPrimaryImage(item.product.colors),
       },
     };
   });
 
   const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
-  const shippingItems = cart.items.map((item) => ({
-    quantity: item.quantity,
-    shippingPrice: decimalToNumber(item.product.shippingPrice),
-  }));
-  const shippingFee = calculateCartShippingFee(shippingItems, subtotal);
-  const total = subtotal + shippingFee;
+  const shippingFee = 0;
+  const total = subtotal;
 
   return { id: cart.id, items, subtotal, shippingFee, total, itemCount: items.length };
 }
@@ -109,7 +101,7 @@ export async function createOrderFromCart(params: {
     include: {
       items: {
         include: {
-          product: { include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } } },
+          product: { include: { colors: { orderBy: { sortOrder: "asc" }, take: 1 } } },
         },
       },
     },
@@ -129,11 +121,11 @@ export async function createOrderFromCart(params: {
   }
 
   const orderItems = cart.items.map((item) => {
-    const unitPrice = getEffectivePrice(item.product.price, item.product.salePrice);
+    const unitPrice = decimalToNumber(item.product.price);
     return {
       productId: item.productId,
       productName: item.product.name,
-      productImage: item.product.images[0]?.url ?? "",
+      productImage: getProductPrimaryImage(item.product.colors) ?? "",
       quantity: item.quantity,
       unitPrice,
       totalPrice: unitPrice * item.quantity,
@@ -141,12 +133,8 @@ export async function createOrderFromCart(params: {
   });
 
   const subtotal = orderItems.reduce((sum, item) => sum + item.totalPrice, 0);
-  const shippingItems = cart.items.map((item) => ({
-    quantity: item.quantity,
-    shippingPrice: decimalToNumber(item.product.shippingPrice),
-  }));
-  const shippingFee = calculateCartShippingFee(shippingItems, subtotal);
-  const total = subtotal + shippingFee;
+  const shippingFee = 0;
+  const total = subtotal;
 
   const orderNumber = generateOrderNumber();
 

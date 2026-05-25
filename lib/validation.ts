@@ -54,32 +54,27 @@ export const checkoutSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const productColorSchema = z.object({
+  name: z.string().min(1, "Color name is required"),
+  imageUrl: z.string().url("Valid image URL is required"),
+  sortOrder: z.number().int().optional(),
+});
+
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().min(1, "Description is required"),
   shortDescription: z.string().optional(),
   price: z.number().positive("Price must be positive"),
-  salePrice: z.number().positive().optional().nullable(),
-  shippingPrice: z.number().min(0).default(0),
   sku: z.string().optional(),
   stock: z.number().int().min(0),
   categoryId: z.string().min(1),
   brand: z.string().optional(),
   material: z.string().optional(),
-  color: z.string().optional(),
   size: z.string().optional(),
   isFeatured: z.boolean().optional(),
   isPublished: z.boolean().optional(),
-  images: z
-    .array(
-      z.object({
-        url: z.string().url(),
-        altText: z.string().optional(),
-        sortOrder: z.number().int().optional(),
-      })
-    )
-    .optional(),
+  colors: z.array(productColorSchema).min(1, "At least one color is required"),
 });
 
 export const categorySchema = z.object({

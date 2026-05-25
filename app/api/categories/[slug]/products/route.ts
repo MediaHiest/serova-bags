@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { jsonError, jsonSuccess } from "@/lib/api-utils";
-import { decimalToNumber, getEffectivePrice } from "@/lib/utils";
+import { decimalToNumber, getProductPrimaryImage } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { productQuerySchema } from "@/lib/validation";
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       orderBy,
       skip,
       take: limit,
-      include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
+      include: { colors: { orderBy: { sortOrder: "asc" }, take: 1 } },
     }),
     prisma.product.count({ where }),
   ]);
@@ -49,9 +49,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       name: p.name,
       slug: p.slug,
       price: decimalToNumber(p.price),
-      salePrice: p.salePrice ? decimalToNumber(p.salePrice) : null,
-      effectivePrice: getEffectivePrice(p.price, p.salePrice),
-      image: p.images[0]?.url ?? null,
+      image: getProductPrimaryImage(p.colors),
     })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });

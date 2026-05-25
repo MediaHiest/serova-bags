@@ -10,30 +10,34 @@ interface Category {
   name: string;
 }
 
+interface ColorRow {
+  name: string;
+  imageUrl: string;
+}
+
+const emptyColor = (): ColorRow => ({ name: "", imageUrl: "" });
+
 export default function ProductFormPage({ productId }: { productId?: string }) {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(!!productId);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [colors, setColors] = useState<ColorRow[]>([emptyColor()]);
   const [form, setForm] = useState({
     name: "",
     slug: "",
     description: "",
     shortDescription: "",
     price: "",
-    salePrice: "",
-    shippingPrice: "0",
     sku: "",
     stock: "0",
     categoryId: "",
     brand: "Selora Brand",
     material: "",
-    color: "",
     size: "",
     isFeatured: false,
     isPublished: false,
-    imageUrl: "",
   });
 
   useEffect(() => {
@@ -53,19 +57,23 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
               description: p.description,
               shortDescription: p.shortDescription ?? "",
               price: String(p.price),
-              salePrice: p.salePrice ? String(p.salePrice) : "",
-              shippingPrice: String(p.shippingPrice ?? 0),
               sku: p.sku ?? "",
               stock: String(p.stock),
               categoryId: p.categoryId,
               brand: p.brand ?? "Selora Brand",
               material: p.material ?? "",
-              color: p.color ?? "",
               size: p.size ?? "",
               isFeatured: p.isFeatured,
               isPublished: p.isPublished,
-              imageUrl: p.images?.[0]?.url ?? "",
             });
+            setColors(
+              p.colors?.length
+                ? p.colors.map((c: { name: string; imageUrl: string }) => ({
+                    name: c.name,
+                    imageUrl: c.imageUrl,
+                  }))
+                : [emptyColor()]
+            );
           }
           setLoading(false);
         });
@@ -80,10 +88,29 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
     }));
   }
 
+  function updateColor(index: number, field: keyof ColorRow, value: string) {
+    setColors((prev) => prev.map((c, i) => (i === index ? { ...c, [field]: value } : c)));
+  }
+
+  function addColor() {
+    setColors((prev) => [...prev, emptyColor()]);
+  }
+
+  function removeColor(index: number) {
+    setColors((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError("");
+
+    const validColors = colors.filter((c) => c.name.trim() && c.imageUrl.trim());
+    if (validColors.length === 0) {
+      setError("Add at least one color with name and image URL");
+      setSaving(false);
+      return;
+    }
 
     const payload = {
       name: form.name,
@@ -91,18 +118,19 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
       description: form.description,
       shortDescription: form.shortDescription || undefined,
       price: parseFloat(form.price),
-      salePrice: form.salePrice ? parseFloat(form.salePrice) : null,
-      shippingPrice: parseFloat(form.shippingPrice) || 0,
       sku: form.sku || undefined,
       stock: parseInt(form.stock, 10),
       categoryId: form.categoryId,
       brand: form.brand || undefined,
       material: form.material || undefined,
-      color: form.color || undefined,
       size: form.size || undefined,
       isFeatured: form.isFeatured,
       isPublished: form.isPublished,
-      images: form.imageUrl ? [{ url: form.imageUrl, altText: form.name }] : [],
+      colors: validColors.map((c, i) => ({
+        name: c.name.trim(),
+        imageUrl: c.imageUrl.trim(),
+        sortOrder: i,
+      })),
     };
 
     const url = productId ? `/api/admin/products/${productId}` : "/api/admin/products";
@@ -144,8 +172,6 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
         <input className="input-field" placeholder="Short Description" value={form.shortDescription} onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} />
         <div className="grid md:grid-cols-2 gap-4">
           <input className="input-field" type="number" step="0.01" placeholder="Price (EGP)" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
-          <input className="input-field" type="number" step="0.01" placeholder="Sale Price" value={form.salePrice} onChange={(e) => setForm({ ...form, salePrice: e.target.value })} />
-          <input className="input-field" type="number" step="0.01" placeholder="Shipping Price (EGP)" value={form.shippingPrice} onChange={(e) => setForm({ ...form, shippingPrice: e.target.value })} required />
           <input className="input-field" type="number" placeholder="Stock" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} required />
         </div>
         <select className="input-field" value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required>
@@ -154,14 +180,49 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <input className="input-field" placeholder="Brand" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
           <input className="input-field" placeholder="Material" value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} />
-          <input className="input-field" placeholder="Color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} />
         </div>
         <input className="input-field" placeholder="Size" value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} />
-        <input className="input-field" placeholder="Image URL" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
-        <p className="text-xs text-text-muted">TODO: Add file upload / S3 integration for product images</p>
+
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <label className="input-label mb-0">Colors & images</label>
+            <button type="button" onClick={addColor} className="text-xs text-text-muted hover:text-text-dark underline">
+              + Add color
+            </button>
+          </div>
+          <p className="text-xs text-text-muted">Each color needs a name and image URL shown when customers select it.</p>
+          {colors.map((color, index) => (
+            <div key={index} className="grid md:grid-cols-[1fr_2fr_auto] gap-3 items-start p-3 rounded-lg border border-text-dark/10">
+              <input
+                className="input-field"
+                placeholder="Color name (e.g. Beige)"
+                value={color.name}
+                onChange={(e) => updateColor(index, "name", e.target.value)}
+                required
+              />
+              <input
+                className="input-field"
+                placeholder="Image URL"
+                value={color.imageUrl}
+                onChange={(e) => updateColor(index, "imageUrl", e.target.value)}
+                required
+              />
+              {colors.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeColor(index)}
+                  className="text-xs text-red-600 underline px-2 py-3"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+
         <div className="flex gap-6">
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} />

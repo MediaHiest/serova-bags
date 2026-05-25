@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
+import { ShippingFeeHint, ShippingFeeLabel } from "@/components/store/ShippingFeeHint";
 
 interface Address {
   id: string;
@@ -160,7 +161,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 md:py-16 pb-28 lg:pb-16">
       <div className="text-center mb-10 md:mb-14">
         <h1 className="page-title text-3xl md:text-4xl text-text-dark">Checkout</h1>
         <div className="title-underline" />
@@ -174,7 +175,7 @@ export default function CheckoutPage() {
         <div className="lg:col-span-3 space-y-8">
           {/* Delivery address */}
           <section className="account-card p-6 md:p-8">
-            <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mb-6">
               <h2 className="text-sm tracking-widest uppercase text-text-dark font-medium">
                 Delivery Address
               </h2>
@@ -349,25 +350,18 @@ export default function CheckoutPage() {
                     <span className="text-text-muted">Subtotal</span>
                     <span className="text-text-dark">{formatPrice(cart.subtotal)} EGP</span>
                   </div>
-                  <div className="flex justify-between text-base">
+                  <div className="flex justify-between text-base items-start gap-3">
                     <span className="text-text-muted">Shipping</span>
-                    <span className="text-text-dark">
-                      {cart.shippingFee === 0 ? (
-                        <span className="text-green-charcoal font-medium">Free</span>
-                      ) : (
-                        `${formatPrice(cart.shippingFee)} EGP`
-                      )}
-                    </span>
+                    <ShippingFeeLabel />
                   </div>
-                  {cart.subtotal >= 5000 && cart.shippingFee === 0 && (
-                    <p className="text-xs text-green-charcoal bg-green-charcoal/5 rounded-lg px-3 py-2">
-                      Free shipping applied on orders above 5,000 EGP
-                    </p>
-                  )}
+                  <ShippingFeeHint />
                   <div className="flex justify-between text-lg font-semibold pt-3 border-t border-text-dark/10">
                     <span className="text-text-dark">Total</span>
-                    <span className="text-text-dark">{formatPrice(cart.total)} EGP</span>
+                    <span className="text-text-dark">{formatPrice(cart.subtotal)} EGP</span>
                   </div>
+                  <p className="text-xs text-text-muted pt-1">
+                    Total excludes shipping fees payable to the provider at delivery.
+                  </p>
                 </div>
               </>
             )}
@@ -380,7 +374,7 @@ export default function CheckoutPage() {
               type="button"
               onClick={placeOrder}
               disabled={submitting || !selectedAddress}
-              className="btn-primary w-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary hidden lg:block w-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Placing Order..." : "Place Order"}
             </button>
@@ -394,6 +388,30 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {cart && (
+        <div className="mobile-sticky-bar lg:hidden">
+          <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs text-text-muted uppercase tracking-wide">Total</p>
+              <p className="text-lg font-semibold text-text-dark truncate">
+                {formatPrice(cart.subtotal)} EGP
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={placeOrder}
+              disabled={submitting || !selectedAddress}
+              className="btn-primary shrink-0 py-3 px-5 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitting ? "..." : "Place Order"}
+            </button>
+          </div>
+          {error && (
+            <p className="text-red-600 text-xs mt-2 text-center truncate">{error}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

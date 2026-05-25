@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
       include: {
         category: { select: { name: true, slug: true } },
-        images: { orderBy: { sortOrder: "asc" } },
+        colors: { orderBy: { sortOrder: "asc" } },
       },
     }),
     prisma.product.count(),
@@ -30,8 +30,6 @@ export async function GET(request: NextRequest) {
     products: products.map((p) => ({
       ...p,
       price: decimalToNumber(p.price),
-      salePrice: p.salePrice ? decimalToNumber(p.salePrice) : null,
-      shippingPrice: decimalToNumber(p.shippingPrice),
     })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
@@ -53,18 +51,30 @@ export async function POST(request: NextRequest) {
   const existing = await prisma.product.findUnique({ where: { slug } });
   if (existing) return jsonError("Slug already exists", 409);
 
-  const { images, ...productData } = data;
+  const { colors, ...productData } = data;
 
   const product = await prisma.product.create({
     data: {
       ...productData,
       slug,
-      images: images?.length
-        ? { create: images.map((img, i) => ({ ...img, sortOrder: img.sortOrder ?? i })) }
-        : undefined,
+      colors: {
+        create: colors.map((c, i) => ({
+          name: c.name,
+          imageUrl: c.imageUrl,
+          sortOrder: c.sortOrder ?? i,
+        })),
+      },
     },
-    include: { images: true, category: true },
+    include: { colors: { orderBy: { sortOrder: "asc" } }, category: true },
   });
 
-  return jsonSuccess({ product }, 201);
+  return jsonSuccess(
+    {
+      product: {
+        ...product,
+        price: decimalToNumber(product.price),
+      },
+    },
+    201
+  );
 }

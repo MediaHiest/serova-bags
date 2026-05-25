@@ -29,10 +29,10 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-medium text-text-dark mb-8">Users</h1>
+      <h1 className="text-xl sm:text-2xl font-medium text-text-dark mb-6 sm:mb-8">Users</h1>
 
-      <div className="admin-card overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="admin-card overflow-x-auto -mx-4 sm:mx-0 rounded-none sm:rounded-lg">
+        <table className="w-full text-sm min-w-[560px]">
           <thead>
             <tr className="border-b text-left text-text-muted">
               <th className="pb-3 pr-4">Name</th>

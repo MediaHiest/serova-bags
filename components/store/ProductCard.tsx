@@ -6,13 +6,10 @@ interface ProductCardProps {
   name: string;
   slug: string;
   price: number;
-  salePrice?: number | null;
   image: string | null;
 }
 
-export default function ProductCard({ name, slug, price, salePrice, image }: ProductCardProps) {
-  const displayPrice = salePrice && salePrice < price ? salePrice : price;
-
+export default function ProductCard({ name, slug, price, image }: ProductCardProps) {
   return (
     <Link href={`/products/${slug}`} className="group block">
       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-bg-off-white">
@@ -32,7 +29,7 @@ export default function ProductCard({ name, slug, price, salePrice, image }: Pro
         <div className="product-card-overlay absolute bottom-0 left-0 right-0 px-4 py-2.5 flex items-center justify-between gap-3">
           <span className="product-card-name truncate">{name}</span>
           <span className="product-card-price whitespace-nowrap">
-            {formatPrice(displayPrice)} EGP
+            {formatPrice(price)} EGP
           </span>
         </div>
       </div>

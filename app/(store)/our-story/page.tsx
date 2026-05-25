@@ -4,7 +4,7 @@ export default function OurStoryPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
       <div className="text-center mb-12">
-        <h1 className="page-title text-4xl md:text-5xl text-text-dark">Our Story</h1>
+        <h1 className="page-title text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-text-dark">Our Story</h1>
         <div className="title-underline" />
       </div>
 

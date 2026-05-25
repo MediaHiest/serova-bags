@@ -1,5 +1,5 @@
 import { jsonError, jsonSuccess } from "@/lib/api-utils";
-import { decimalToNumber, getEffectivePrice } from "@/lib/utils";
+import { decimalToNumber, getProductPrimaryImage } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: Params) {
     where: { slug, isPublished: true },
     include: {
       category: { select: { name: true, slug: true } },
-      images: { orderBy: { sortOrder: "asc" } },
+      colors: { orderBy: { sortOrder: "asc" } },
     },
   });
 
@@ -24,7 +24,7 @@ export async function GET(_request: Request, { params }: Params) {
       id: { not: product.id },
     },
     take: 4,
-    include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
+    include: { colors: { orderBy: { sortOrder: "asc" }, take: 1 } },
   });
 
   return jsonSuccess({
@@ -35,15 +35,12 @@ export async function GET(_request: Request, { params }: Params) {
       description: product.description,
       shortDescription: product.shortDescription,
       price: decimalToNumber(product.price),
-      salePrice: product.salePrice ? decimalToNumber(product.salePrice) : null,
-      effectivePrice: getEffectivePrice(product.price, product.salePrice),
       sku: product.sku,
       brand: product.brand,
       material: product.material,
-      color: product.color,
       size: product.size,
       category: product.category,
-      images: product.images,
+      colors: product.colors,
       inStock: product.stock > 0,
     },
     related: related.map((p) => ({
@@ -51,9 +48,7 @@ export async function GET(_request: Request, { params }: Params) {
       name: p.name,
       slug: p.slug,
       price: decimalToNumber(p.price),
-      salePrice: p.salePrice ? decimalToNumber(p.salePrice) : null,
-      effectivePrice: getEffectivePrice(p.price, p.salePrice),
-      image: p.images[0]?.url ?? null,
+      image: getProductPrimaryImage(p.colors),
     })),
   });
 }

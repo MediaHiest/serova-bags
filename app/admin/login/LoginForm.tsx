@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import BrandLogo from "@/components/store/BrandLogo";
 
 export default function AdminLoginForm() {
   const router = useRouter();
@@ -37,8 +38,14 @@ export default function AdminLoginForm() {
   return (
     <div className="min-h-screen pattern-bg flex items-center justify-center px-4">
       <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-sm">
-        <h1 className="page-title text-2xl text-text-dark text-center mb-2">Admin Login</h1>
-        <p className="text-sm text-text-muted text-center mb-8">Selora Brand Dashboard</p>
+        <div className="flex justify-center mb-6">
+          <BrandLogo
+            variant="navbar"
+            className="logo-blend-screen"
+            imageClassName="h-10 w-auto max-w-[180px]"
+          />
+        </div>
+        <h1 className="page-title text-2xl text-text-dark text-center mb-8">Admin Login</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input

@@ -14,12 +14,11 @@ interface Product {
   name: string;
   slug: string;
   price: number;
-  shippingPrice: number;
   stock: number;
   isPublished: boolean;
   isFeatured: boolean;
   category: { name: string };
-  images: { url: string }[];
+  colors: { name: string; imageUrl: string }[];
 }
 
 export default function AdminProductsPage() {
@@ -56,21 +55,20 @@ export default function AdminProductsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-medium text-text-dark">Products</h1>
-        <Link href="/admin/products/new" className="btn-primary text-xs py-2 px-4">
+      <div className="admin-page-header">
+        <h1 className="text-xl sm:text-2xl font-medium text-text-dark">Products</h1>
+        <Link href="/admin/products/new" className="btn-primary text-xs py-2 px-4 shrink-0">
           Add Product
         </Link>
       </div>
 
-      <div className="admin-card overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="admin-card overflow-x-auto -mx-4 sm:mx-0 rounded-none sm:rounded-lg">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b text-left text-text-muted">
               <th className="pb-3 pr-4">Name</th>
               <th className="pb-3 pr-4">Category</th>
               <th className="pb-3 pr-4">Price</th>
-              <th className="pb-3 pr-4">Shipping</th>
               <th className="pb-3 pr-4">Stock</th>
               <th className="pb-3 pr-4">Status</th>
               <th className="pb-3">Actions</th>
@@ -82,7 +80,6 @@ export default function AdminProductsPage() {
                 <td className="py-3 pr-4">{p.name}</td>
                 <td className="py-3 pr-4 text-text-muted">{p.category?.name}</td>
                 <td className="py-3 pr-4">{formatPrice(p.price)} EGP</td>
-                <td className="py-3 pr-4">{formatPrice(p.shippingPrice ?? 0)} EGP</td>
                 <td className="py-3 pr-4">{p.stock}</td>
                 <td className="py-3 pr-4">
                   <button

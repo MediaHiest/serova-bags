@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import ProductDetailClient from "@/components/store/ProductDetailClient";
 import { prisma } from "@/lib/prisma";
-import { decimalToNumber, getEffectivePrice } from "@/lib/utils";
+import { decimalToNumber, getProductPrimaryImage } from "@/lib/utils";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -12,11 +12,12 @@ export default async function ProductPage({ params }: Params) {
     where: { slug, isPublished: true },
     include: {
       category: { select: { name: true, slug: true } },
-      images: { orderBy: { sortOrder: "asc" } },
+      colors: { orderBy: { sortOrder: "asc" } },
     },
   });
 
   if (!product) notFound();
+  if (product.colors.length === 0) notFound();
 
   const related = await prisma.product.findMany({
     where: {
@@ -25,7 +26,7 @@ export default async function ProductPage({ params }: Params) {
       id: { not: product.id },
     },
     take: 4,
-    include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
+    include: { colors: { orderBy: { sortOrder: "asc" }, take: 1 } },
   });
 
   return (
@@ -37,15 +38,12 @@ export default async function ProductPage({ params }: Params) {
         description: product.description,
         shortDescription: product.shortDescription,
         price: decimalToNumber(product.price),
-        salePrice: product.salePrice ? decimalToNumber(product.salePrice) : null,
-        effectivePrice: getEffectivePrice(product.price, product.salePrice),
         maxQuantity: product.stock,
         brand: product.brand,
         material: product.material,
-        color: product.color,
         size: product.size,
         category: product.category,
-        images: product.images,
+        colors: product.colors,
         inStock: product.stock > 0,
       }}
       related={related.map((p) => ({
@@ -53,9 +51,7 @@ export default async function ProductPage({ params }: Params) {
         name: p.name,
         slug: p.slug,
         price: decimalToNumber(p.price),
-        salePrice: p.salePrice ? decimalToNumber(p.salePrice) : null,
-        effectivePrice: getEffectivePrice(p.price, p.salePrice),
-        image: p.images[0]?.url ?? null,
+        image: getProductPrimaryImage(p.colors),
       }))}
     />
   );

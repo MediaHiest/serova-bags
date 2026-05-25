@@ -79,12 +79,12 @@ export default function OrdersPage() {
                     {order.itemCount} item{order.itemCount !== 1 ? "s" : ""}
                   </p>
                 </div>
-                <div className="flex items-center gap-4 sm:text-right">
-                  <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 sm:gap-4 sm:justify-end w-full sm:w-auto">
+                  <div className="flex flex-wrap gap-2">
                     <OrderStatusBadge status={order.status} />
                     <OrderStatusBadge status={order.paymentStatus} />
                   </div>
-                  <p className="text-sm font-medium whitespace-nowrap">
+                  <p className="text-sm font-medium">
                     {formatPrice(order.total)} EGP
                   </p>
                 </div>

@@ -63,16 +63,16 @@ export default async function AccountDashboardPage() {
         description={`Member since ${memberSince}`}
       />
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <div className="account-stat-card">
           <p className="text-xs tracking-widest uppercase text-text-muted">Orders</p>
-          <p className="page-title text-3xl text-text-dark mt-1">{user._count.orders}</p>
+          <p className="page-title text-2xl sm:text-3xl text-text-dark mt-1">{user._count.orders}</p>
         </div>
         <div className="account-stat-card">
           <p className="text-xs tracking-widest uppercase text-text-muted">Addresses</p>
-          <p className="page-title text-3xl text-text-dark mt-1">{user._count.addresses}</p>
+          <p className="page-title text-2xl sm:text-3xl text-text-dark mt-1">{user._count.addresses}</p>
         </div>
-        <div className="account-stat-card col-span-2 md:col-span-1">
+        <div className="account-stat-card md:col-span-1">
           <p className="text-xs tracking-widest uppercase text-text-muted">Email</p>
           <p className="text-sm text-text-dark mt-2 truncate">{user.email}</p>
         </div>
@@ -125,11 +125,11 @@ export default async function AccountDashboardPage() {
               <Link
                 key={order.id}
                 href={`/account/orders/${order.id}`}
-                className="account-card flex items-center gap-4 p-4 hover:opacity-85 transition-opacity"
+                className="account-card flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 hover:opacity-85 transition-opacity"
               >
                 {order.items[0]?.productImage && (
                   <div
-                    className="w-14 h-16 rounded-lg bg-bg-beige bg-cover bg-center flex-shrink-0"
+                    className="w-full sm:w-14 h-32 sm:h-16 rounded-lg bg-bg-beige bg-cover bg-center shrink-0"
                     style={{ backgroundImage: `url(${order.items[0].productImage})` }}
                   />
                 )}
@@ -145,11 +145,9 @@ export default async function AccountDashboardPage() {
                     {order._count.items} item{order._count.items !== 1 ? "s" : ""}
                   </p>
                 </div>
-                <div className="text-right flex-shrink-0">
+                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 w-full sm:w-auto">
                   <p className="text-sm font-medium">{formatPrice(decimalToNumber(order.total))} EGP</p>
-                  <div className="mt-1.5">
-                    <OrderStatusBadge status={order.status} />
-                  </div>
+                  <OrderStatusBadge status={order.status} />
                 </div>
               </Link>
             ))}
