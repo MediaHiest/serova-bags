@@ -1,26 +1,378 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand palette */
+  --color-primary-dark: #080a0a;
+  --color-muted-tan: #b69d81;
+  --color-light-cream: #efddce;
+  --color-dark-charcoal: #26221d;
+
+  /* Semantic tokens */
+  --bg-beige: var(--color-light-cream);
+  --bg-pattern: #dcc8b4;
+  --bg-off-white: var(--color-light-cream);
+  --green-charcoal: var(--color-dark-charcoal);
+  --text-dark: var(--color-primary-dark);
+  --text-muted: var(--color-muted-tan);
+  --overlay-dark: rgba(8, 10, 10, 0.75);
+  --announcement-bg: var(--color-primary-dark);
+  --announcement-text: var(--color-light-cream);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-muted-tan: var(--color-muted-tan);
+  --color-light-cream: var(--color-light-cream);
+  --color-dark-charcoal: var(--color-dark-charcoal);
+  --color-bg-beige: var(--bg-beige);
+  --color-bg-pattern: var(--bg-pattern);
+  --color-bg-off-white: var(--bg-off-white);
+  --color-green-charcoal: var(--green-charcoal);
+  --color-text-dark: var(--text-dark);
+  --color-text-muted: var(--text-muted);
+  --color-overlay-dark: var(--overlay-dark);
+  --font-sans: var(--font-jost);
+  --font-display: var(--font-cormorant);
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.3125rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-size: 17px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-beige);
+  color: var(--text-dark);
+  font-family: var(--font-jost), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pattern-bg {
+  background-color: var(--bg-beige);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(239, 221, 206, 0.5) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(182, 157, 129, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+}
+
+.announcement-bar {
+  background-color: var(--announcement-bg);
+  color: var(--announcement-text);
+  letter-spacing: 0.18em;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.page-title {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.site-header {
+  background-color: var(--bg-beige);
+  border-top: 1px solid var(--text-dark);
+}
+
+.site-nav-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 4.5rem;
+  gap: 1.5rem;
+}
+
+.site-nav-logo {
+  font-family: var(--font-script), "Great Vibes", cursive;
+  font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+  font-weight: 400;
+  color: var(--text-dark);
+  line-height: 1;
+  white-space: nowrap;
+  justify-self: start;
+}
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  justify-self: center;
+}
+
+.site-nav-link {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.site-nav-link:hover {
+  color: var(--text-dark);
+}
+
+.site-nav-link-active {
+  color: var(--text-dark);
+}
+
+.site-nav-utilities {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  justify-self: end;
+}
+
+.site-nav-locale {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.2s;
+}
+
+.site-nav-locale:hover {
+  color: var(--text-dark);
+}
+
+.site-nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.site-nav-icon {
+  color: var(--text-dark);
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.site-nav-icon:hover {
+  opacity: 0.6;
+}
+
+.title-underline {
+  width: 40px;
+  height: 1px;
+  background-color: var(--text-dark);
+  margin: 0.75rem auto 0;
+}
+
+.product-card-overlay {
+  background: var(--overlay-dark);
+}
+
+.product-card-name {
+  color: var(--bg-off-white);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.product-card-price {
+  color: var(--bg-off-white);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: var(--green-charcoal);
+  color: var(--bg-off-white);
+  padding: 0.875rem 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
+.btn-outline {
+  border: 1px solid var(--green-charcoal);
+  color: var(--green-charcoal);
+  padding: 0.875rem 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background-color: var(--green-charcoal);
+  color: var(--bg-off-white);
+}
+
+.input-field {
+  width: 100%;
+  border: 1px solid rgba(38, 34, 29, 0.2);
+  background: var(--bg-off-white);
+  padding: 0.875rem 1.125rem;
+  font-size: 1rem;
+  color: var(--text-dark);
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--green-charcoal);
+}
+
+.select-field {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--text-muted);
+  padding: 0.625rem 1.5rem 0.625rem 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  cursor: pointer;
+  outline: none;
+}
+
+.admin-sidebar {
+  background-color: var(--green-charcoal);
+  color: var(--bg-off-white);
+}
+
+.account-card {
+  background: rgba(239, 221, 206, 0.7);
+  border: 1px solid rgba(38, 34, 29, 0.08);
+  border-radius: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.account-stat-card {
+  background: rgba(239, 221, 206, 0.85);
+  border: 1px solid rgba(38, 34, 29, 0.08);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.admin-card {
+  background: white;
+  border: 1px solid rgba(38, 34, 29, 0.1);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.empty-products-card {
+  background: rgba(239, 221, 206, 0.65);
+  border: 1px solid rgba(38, 34, 29, 0.08);
+  border-radius: 1.25rem;
+}
+
+.empty-products-icon {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  background: rgba(38, 34, 29, 0.06);
+  color: var(--green-charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-footer {
+  background-color: var(--green-charcoal);
+  color: var(--bg-off-white);
+}
+
+.site-footer-brand-story {
+  color: rgba(239, 221, 206, 0.92);
+  font-weight: 400;
+  line-height: 1.85;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+}
+
+.site-footer-heading {
+  color: var(--bg-off-white);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.site-footer-link {
+  color: rgba(239, 221, 206, 0.72);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+
+.site-footer-link:hover {
+  color: var(--bg-off-white);
+}
+
+.site-footer-text {
+  color: rgba(239, 221, 206, 0.72);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.site-footer-bottom {
+  border-top: 1px solid rgba(239, 221, 206, 0.12);
+  color: rgba(239, 221, 206, 0.6);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.site-footer-locale {
+  color: rgba(239, 221, 206, 0.72);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+
+.site-footer-watermark {
+  border-top: 1px solid rgba(239, 221, 206, 0.08);
+  overflow: hidden;
+}
+
+.site-footer-watermark-inner {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem 3rem;
+  opacity: 0.14;
+  user-select: none;
+  pointer-events: none;
+}
+
+.site-footer-logo {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--bg-off-white);
+  white-space: nowrap;
 }
