@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { formatPrice } from "@/lib/utils";
-import { ShippingFeeLabel } from "@/components/store/ShippingFeeHint";
+import { formatPrice, qualifiesForFreeShipping } from "@/lib/utils";
+import { FreeShippingProgress, ShippingFeeLabel } from "@/components/store/ShippingFeeHint";
 
 interface CartItem {
   id: string;
@@ -294,6 +294,10 @@ export default function CartPage() {
               Order Summary
             </h2>
 
+            <div className="mb-6">
+              <FreeShippingProgress subtotal={cart.subtotal} />
+            </div>
+
             <div className="space-y-3 pb-5 mb-5 border-b border-text-dark/10">
               {cart.items.map((item) => (
                 <div key={item.id} className="flex justify-between gap-3 text-sm">
@@ -315,14 +319,16 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between text-base items-start gap-3">
                 <span className="text-text-muted">Shipping</span>
-                <ShippingFeeLabel />
+                <ShippingFeeLabel subtotal={cart.subtotal} />
               </div>
               <div className="flex justify-between text-lg font-semibold pt-4 border-t border-text-dark/10">
                 <span className="text-text-dark">Total</span>
                 <span className="text-text-dark">{formatPrice(cart.subtotal)} EGP</span>
               </div>
               <p className="text-xs text-text-muted text-center pt-1">
-                Excludes shipping · Cash on delivery available
+                {qualifiesForFreeShipping(cart.subtotal)
+                  ? "Free shipping included · Cash on delivery available"
+                  : "Shipping at delivery unless order exceeds 10,000 EGP"}
               </p>
             </div>
 

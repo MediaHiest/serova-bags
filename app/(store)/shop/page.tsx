@@ -45,8 +45,8 @@ async function getProducts(page: number, sort: string, categorySlug?: string) {
   return {
     title: category?.name ?? "Shop All",
     subtitle: category
-      ? `Discover Selora's ${category.name}`
-      : "Discover Selora's Collection",
+      ? `Discover Serova's ${category.name}`
+      : "Discover Serova's Collection",
     products: products.map((p) => ({
       id: p.id,
       name: p.name,

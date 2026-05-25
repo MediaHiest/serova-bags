@@ -74,7 +74,7 @@ export default async function BagsPage({ searchParams }: BagsPageProps) {
     <Suspense>
       <ProductListing
         title="Bags"
-        subtitle="Discover Selora's Functional Bags for Every Occasion"
+        subtitle="Discover Serova's Functional Bags for Every Occasion"
         products={products}
         pagination={pagination}
         basePath="/bags"

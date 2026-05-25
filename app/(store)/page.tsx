@@ -50,7 +50,7 @@ export default async function HomePage() {
       <section className="relative py-14 sm:py-20 md:py-32 px-4 sm:px-6 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="page-title text-2xl sm:text-3xl md:text-5xl lg:text-6xl text-text-dark mb-4 sm:mb-6 leading-tight">
-            Carry Your Style Anywhere with Selora&apos;s Premium Bags
+            Carry Your Style Anywhere with Serova&apos;s Premium Bags
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-text-muted font-normal leading-relaxed mb-8 sm:mb-10 max-w-xl mx-auto">
             Elevate your everyday look with our collection of premium bags. From sleek totes to

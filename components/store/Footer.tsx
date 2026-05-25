@@ -76,7 +76,7 @@ export default function Footer() {
             <h4 className="site-footer-heading mb-5">Our Stores</h4>
             <BrandLogo
               variant="footer"
-              imageClassName="h-10 w-auto max-w-[200px] opacity-90"
+              imageClassName="h-14 sm:h-16 w-auto max-w-[280px] opacity-90"
             />
           </div>
         </div>
@@ -91,19 +91,6 @@ export default function Footer() {
             <span className="opacity-30">|</span>
             <span>م.ج</span>
           </p>
-        </div>
-      </div>
-
-      {/* Decorative brand watermark strip — as in PDF */}
-      <div className="site-footer-watermark py-8">
-        <div className="site-footer-watermark-inner px-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <BrandLogo
-              key={i}
-              variant="footer"
-              imageClassName="h-8 md:h-10 w-auto max-w-[180px]"
-            />
-          ))}
         </div>
       </div>
     </footer>

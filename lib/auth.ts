@@ -2,8 +2,8 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 
-const USER_TOKEN_COOKIE = "selora_token";
-const ADMIN_TOKEN_COOKIE = "selora_admin_token";
+const USER_TOKEN_COOKIE = "serova_token";
+const ADMIN_TOKEN_COOKIE = "serova_admin_token";
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;

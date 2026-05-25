@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, qualifiesForFreeShipping } from "@/lib/utils";
 import { ShippingFeeLabel } from "@/components/store/ShippingFeeHint";
 import AccountPageHeader from "@/components/store/account/AccountPageHeader";
 import AccountLoading from "@/components/store/account/AccountLoading";
@@ -137,7 +137,11 @@ export default function OrderDetailPage() {
             <div className="flex justify-between text-sm items-start gap-3">
               <span className="text-text-muted">Shipping</span>
               {(order.shippingFee as number) === 0 ? (
-                <ShippingFeeLabel />
+                qualifiesForFreeShipping(order.subtotal as number) ? (
+                  <span className="text-green-charcoal font-medium text-sm">Free</span>
+                ) : (
+                  <ShippingFeeLabel subtotal={order.subtotal as number} />
+                )
               ) : (
                 <span>{formatPrice(order.shippingFee as number)} EGP</span>
               )}

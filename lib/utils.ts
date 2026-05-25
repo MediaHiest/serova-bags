@@ -31,6 +31,12 @@ export function decimalToNumber(value: { toString(): string }): number {
   return parseFloat(value.toString());
 }
 
+export const FREE_SHIPPING_THRESHOLD = 10000;
+
+export function qualifiesForFreeShipping(subtotal: number): boolean {
+  return subtotal >= FREE_SHIPPING_THRESHOLD;
+}
+
 export function getProductPrimaryImage(
   colors: { imageUrl: string; sortOrder: number }[] | null | undefined
 ): string | null {

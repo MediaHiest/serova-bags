@@ -19,7 +19,7 @@ export default function OurStoryPage() {
           lines. Today our team is 25 people and still growing.
         </p>
         <p>
-          Selora is an Egyptian fashion e-commerce brand, empowering independent women to wear
+          Serova is an Egyptian fashion e-commerce brand, empowering independent women to wear
           whatever they want and celebrating the many characters they have.
         </p>
         <p>
@@ -39,7 +39,7 @@ export default function OurStoryPage() {
       <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-bg-off-white max-w-2xl mx-auto">
         <Image
           src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80"
-          alt="Selora Brand craftsmanship"
+          alt="Serova Brand craftsmanship"
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 672px"

@@ -27,14 +27,14 @@ const bagImages = [
   "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
 ];
 
-const brands = [{ name: "Selora Brand", slug: "selora-brand" }];
+const brands = [{ name: "serova Brand", slug: "serova-brand" }];
 
 const products = [
   {
     name: "The Linea Genuine Bag",
     slug: "the-linea-genuine-bag",
     categorySlug: "tote-bags",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
     description:
       "A timeless genuine leather tote crafted for the modern woman. Spacious interior with premium finishing and durable handles for everyday elegance.",
     shortDescription: "Premium genuine leather tote for everyday elegance.",
@@ -57,7 +57,7 @@ const products = [
     isPublished: true,
     material: "Vegan Leather",
     color: "Beige",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Black Everyday Crossbody Bag",
@@ -71,7 +71,7 @@ const products = [
     isPublished: true,
     material: "Leather",
     color: "Black",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Mini Evening Clutch",
@@ -85,7 +85,7 @@ const products = [
     isPublished: true,
     material: "Satin",
     color: "Gold",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Brown Structured Tote",
@@ -99,7 +99,7 @@ const products = [
     isPublished: true,
     material: "Leather",
     color: "Brown",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Soft Leather Wallet",
@@ -113,7 +113,7 @@ const products = [
     isPublished: true,
     material: "Leather",
     color: "Tan",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Travel Duffle Bag",
@@ -127,7 +127,7 @@ const products = [
     isPublished: true,
     material: "Canvas & Leather",
     color: "Olive",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Casual Backpack",
@@ -141,7 +141,7 @@ const products = [
     isPublished: true,
     material: "Nylon",
     color: "Black",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Olive Laptop Sleeve",
@@ -156,7 +156,7 @@ const products = [
     material: "Felt & Leather",
     color: "Olive",
     size: "15 inch",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Elegant Shoulder Bag",
@@ -170,7 +170,7 @@ const products = [
     isPublished: true,
     material: "Leather",
     color: "Cream",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Premium Daily Handbag",
@@ -184,7 +184,7 @@ const products = [
     isPublished: true,
     material: "Genuine Leather",
     color: "Black",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
   {
     name: "Modern City Bag",
@@ -198,7 +198,7 @@ const products = [
     isPublished: true,
     material: "Vegan Leather",
     color: "Charcoal",
-    brandSlug: "selora-brand",
+    brandSlug: "serova-brand",
   },
 ];
 
@@ -263,7 +263,7 @@ async function main() {
     }
   }
 
-  const demoEmail = "demo@selora.com";
+  const demoEmail = "demo@serova.com";
   const existingUser = await prisma.user.findUnique({ where: { email: demoEmail } });
   if (!existingUser) {
     const hashed = await bcrypt.hash("password123", 12);
@@ -277,7 +277,7 @@ async function main() {
         cart: { create: {} },
       },
     });
-    console.log("Created demo user: demo@selora.com / password123");
+    console.log("Created demo user: demo@serova.com / password123");
   }
 
   console.log("Seed completed.");

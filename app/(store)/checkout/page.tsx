@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, qualifiesForFreeShipping } from "@/lib/utils";
 import { ShippingFeeHint, ShippingFeeLabel } from "@/components/store/ShippingFeeHint";
 
 interface Address {
@@ -352,16 +352,18 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-base items-start gap-3">
                     <span className="text-text-muted">Shipping</span>
-                    <ShippingFeeLabel />
+                    <ShippingFeeLabel subtotal={cart.subtotal} />
                   </div>
-                  <ShippingFeeHint />
+                  <ShippingFeeHint subtotal={cart.subtotal} />
                   <div className="flex justify-between text-lg font-semibold pt-3 border-t border-text-dark/10">
                     <span className="text-text-dark">Total</span>
                     <span className="text-text-dark">{formatPrice(cart.subtotal)} EGP</span>
                   </div>
-                  <p className="text-xs text-text-muted pt-1">
-                    Total excludes shipping fees payable to the provider at delivery.
-                  </p>
+                  {!qualifiesForFreeShipping(cart.subtotal) && (
+                    <p className="text-xs text-text-muted pt-1">
+                      Total excludes shipping fees payable to the provider at delivery.
+                    </p>
+                  )}
                 </div>
               </>
             )}

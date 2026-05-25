@@ -21,9 +21,9 @@ const greatVibes = Great_Vibes({
 });
 
 export const metadata: Metadata = {
-  title: "Selora Brand | Premium Bags & Fashion Accessories",
+  title: "Serova Brand | Premium Bags & Fashion Accessories",
   description:
-    "Discover Selora's functional bags and fashion accessories. Locally designed and manufactured in Egypt.",
+    "Discover Serova's functional bags and fashion accessories. Locally designed and manufactured in Egypt.",
 };
 
 export default function RootLayout({
