@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
       include: {
         category: { select: { name: true, slug: true } },
+        brand: { select: { name: true, slug: true } },
         colors: { orderBy: { sortOrder: "asc" } },
       },
     }),
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
         })),
       },
     },
-    include: { colors: { orderBy: { sortOrder: "asc" } }, category: true },
+    include: { colors: { orderBy: { sortOrder: "asc" } }, category: true, brand: true },
   });
 
   return jsonSuccess(

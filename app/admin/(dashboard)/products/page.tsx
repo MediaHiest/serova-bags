@@ -1,13 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
-
-interface Category {
-  id: string;
-  name: string;
-}
+import { formatPrice, getProductPrimaryImage } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -18,7 +14,8 @@ interface Product {
   isPublished: boolean;
   isFeatured: boolean;
   category: { name: string };
-  colors: { name: string; imageUrl: string }[];
+  brand: { name: string } | null;
+  colors: { name: string; imageUrl: string; sortOrder: number }[];
 }
 
 export default function AdminProductsPage() {
@@ -63,11 +60,13 @@ export default function AdminProductsPage() {
       </div>
 
       <div className="admin-card overflow-x-auto -mx-4 sm:mx-0 rounded-none sm:rounded-lg">
-        <table className="w-full text-sm min-w-[640px]">
+        <table className="w-full text-sm min-w-[800px]">
           <thead>
             <tr className="border-b text-left text-text-muted">
+              <th className="pb-3 pr-4 w-16">Image</th>
               <th className="pb-3 pr-4">Name</th>
               <th className="pb-3 pr-4">Category</th>
+              <th className="pb-3 pr-4">Brand</th>
               <th className="pb-3 pr-4">Price</th>
               <th className="pb-3 pr-4">Stock</th>
               <th className="pb-3 pr-4">Status</th>
@@ -75,32 +74,54 @@ export default function AdminProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {products.map((p) => (
-              <tr key={p.id} className="border-b border-gray-50">
-                <td className="py-3 pr-4">{p.name}</td>
-                <td className="py-3 pr-4 text-text-muted">{p.category?.name}</td>
-                <td className="py-3 pr-4">{formatPrice(p.price)} EGP</td>
-                <td className="py-3 pr-4">{p.stock}</td>
-                <td className="py-3 pr-4">
-                  <button
-                    onClick={() => togglePublish(p.id, p.isPublished)}
-                    className={`text-xs px-2 py-1 rounded ${
-                      p.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {p.isPublished ? "Published" : "Draft"}
-                  </button>
-                </td>
-                <td className="py-3 flex gap-2">
-                  <Link href={`/admin/products/${p.id}/edit`} className="text-xs underline">
-                    Edit
-                  </Link>
-                  <button onClick={() => deleteProduct(p.id)} className="text-xs text-red-600 underline">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {products.map((p) => {
+              const image = getProductPrimaryImage(p.colors);
+
+              return (
+                <tr key={p.id} className="border-b border-gray-50">
+                  <td className="py-3 pr-4">
+                    <div className="relative h-12 w-12 rounded-lg overflow-hidden bg-bg-off-white shrink-0">
+                      {image ? (
+                        <Image
+                          src={image}
+                          alt={p.name}
+                          fill
+                          className="object-cover"
+                          sizes="48px"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-[10px] text-text-muted text-center px-1">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="py-3 pr-4">{p.name}</td>
+                  <td className="py-3 pr-4 text-text-muted">{p.category?.name}</td>
+                  <td className="py-3 pr-4 text-text-muted">{p.brand?.name ?? "—"}</td>
+                  <td className="py-3 pr-4">{formatPrice(p.price)} EGP</td>
+                  <td className="py-3 pr-4">{p.stock}</td>
+                  <td className="py-3 pr-4">
+                    <button
+                      onClick={() => togglePublish(p.id, p.isPublished)}
+                      className={`text-xs px-2 py-1 rounded ${
+                        p.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {p.isPublished ? "Published" : "Draft"}
+                    </button>
+                  </td>
+                  <td className="py-3 flex gap-2">
+                    <Link href={`/admin/products/${p.id}/edit`} className="text-xs underline">
+                      Edit
+                    </Link>
+                    <button onClick={() => deleteProduct(p.id)} className="text-xs text-red-600 underline">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

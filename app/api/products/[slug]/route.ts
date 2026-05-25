@@ -11,6 +11,7 @@ export async function GET(_request: Request, { params }: Params) {
     where: { slug, isPublished: true },
     include: {
       category: { select: { name: true, slug: true } },
+      brand: { select: { name: true, slug: true } },
       colors: { orderBy: { sortOrder: "asc" } },
     },
   });
@@ -36,7 +37,9 @@ export async function GET(_request: Request, { params }: Params) {
       shortDescription: product.shortDescription,
       price: decimalToNumber(product.price),
       sku: product.sku,
-      brand: product.brand,
+      brand: product.brand
+        ? { name: product.brand.name, slug: product.brand.slug }
+        : null,
       material: product.material,
       size: product.size,
       category: product.category,

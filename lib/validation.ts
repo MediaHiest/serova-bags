@@ -69,7 +69,7 @@ export const productSchema = z.object({
   sku: z.string().optional(),
   stock: z.number().int().min(0),
   categoryId: z.string().min(1),
-  brand: z.string().optional(),
+  brandId: z.string().min(1, "Brand is required"),
   material: z.string().optional(),
   size: z.string().optional(),
   isFeatured: z.boolean().optional(),
@@ -82,6 +82,13 @@ export const categorySchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   description: z.string().optional(),
   imageUrl: z.string().url().optional().or(z.literal("")),
+  isActive: z.boolean().optional(),
+});
+
+export const brandSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  description: z.string().optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -105,6 +112,7 @@ export const productQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(48).default(12),
   sort: z.enum(["newest", "oldest", "price_asc", "price_desc"]).default("newest"),
   category: z.string().optional(),
+  brand: z.string().optional(),
   featured: z.coerce.boolean().optional(),
   search: z.string().optional(),
 });

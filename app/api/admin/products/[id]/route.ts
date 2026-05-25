@@ -13,7 +13,7 @@ export async function GET(_request: Request, { params }: Params) {
   const { id } = await params;
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { colors: { orderBy: { sortOrder: "asc" } }, category: true },
+    include: { colors: { orderBy: { sortOrder: "asc" } }, category: true, brand: true },
   });
   if (!product) return jsonError("Product not found", 404);
 
@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return tx.product.update({
       where: { id },
       data: productData,
-      include: { colors: { orderBy: { sortOrder: "asc" } }, category: true },
+      include: { colors: { orderBy: { sortOrder: "asc" } }, category: true, brand: true },
     });
   });
 

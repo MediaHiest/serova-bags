@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     return jsonError(parsed.error.issues[0]?.message ?? "Invalid query", 400);
   }
 
-  const { page, limit, sort, category, featured, search } = parsed.data;
+  const { page, limit, sort, category, brand, featured, search } = parsed.data;
   const skip = (page - 1) * limit;
 
   const where: Prisma.ProductWhereInput = { isPublished: true };
@@ -24,6 +24,16 @@ export async function GET(request: NextRequest) {
     if (cat && cat.slug !== "all-bags") {
       where.categoryId = cat.id;
     }
+  }
+
+  if (brand) {
+    const brandRecord = await prisma.brand.findFirst({
+      where: {
+        isActive: true,
+        OR: [{ slug: brand }, { name: { equals: brand, mode: "insensitive" } }],
+      },
+    });
+    if (brandRecord) where.brandId = brandRecord.id;
   }
 
   if (featured) where.isFeatured = true;
@@ -51,6 +61,7 @@ export async function GET(request: NextRequest) {
       take: limit,
       include: {
         category: { select: { name: true, slug: true } },
+        brand: { select: { name: true, slug: true } },
         colors: { orderBy: { sortOrder: "asc" }, take: 1 },
       },
     }),
@@ -66,7 +77,7 @@ export async function GET(request: NextRequest) {
       shortDescription: p.shortDescription,
       price: decimalToNumber(p.price),
       category: p.category,
-      brand: p.brand,
+      brand: p.brand ? { name: p.brand.name, slug: p.brand.slug } : null,
       material: p.material,
       size: p.size,
       isFeatured: p.isFeatured,

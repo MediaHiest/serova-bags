@@ -10,6 +10,11 @@ interface Category {
   name: string;
 }
 
+interface Brand {
+  id: string;
+  name: string;
+}
+
 interface ColorRow {
   name: string;
   imageUrl: string;
@@ -20,6 +25,7 @@ const emptyColor = (): ColorRow => ({ name: "", imageUrl: "" });
 export default function ProductFormPage({ productId }: { productId?: string }) {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(!!productId);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -33,7 +39,7 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
     sku: "",
     stock: "0",
     categoryId: "",
-    brand: "Selora Brand",
+    brandId: "",
     material: "",
     size: "",
     isFeatured: false,
@@ -44,6 +50,10 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
     fetch("/api/admin/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data.categories ?? []));
+
+    fetch("/api/admin/brands")
+      .then((res) => res.json())
+      .then((data) => setBrands(data.brands ?? []));
 
     if (productId) {
       fetch(`/api/admin/products/${productId}`)
@@ -60,7 +70,7 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
               sku: p.sku ?? "",
               stock: String(p.stock),
               categoryId: p.categoryId,
-              brand: p.brand ?? "Selora Brand",
+              brandId: p.brandId ?? "",
               material: p.material ?? "",
               size: p.size ?? "",
               isFeatured: p.isFeatured,
@@ -121,7 +131,7 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
       sku: form.sku || undefined,
       stock: parseInt(form.stock, 10),
       categoryId: form.categoryId,
-      brand: form.brand || undefined,
+      brandId: form.brandId,
       material: form.material || undefined,
       size: form.size || undefined,
       isFeatured: form.isFeatured,
@@ -180,11 +190,16 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
+        <select className="input-field" value={form.brandId} onChange={(e) => setForm({ ...form, brandId: e.target.value })} required>
+          <option value="">Select Brand</option>
+          {brands.map((b) => (
+            <option key={b.id} value={b.id}>{b.name}</option>
+          ))}
+        </select>
         <div className="grid md:grid-cols-2 gap-4">
-          <input className="input-field" placeholder="Brand" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
           <input className="input-field" placeholder="Material" value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} />
+          <input className="input-field" placeholder="Size" value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} />
         </div>
-        <input className="input-field" placeholder="Size" value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} />
 
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">

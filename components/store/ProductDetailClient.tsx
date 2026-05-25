@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProductCard from "@/components/store/ProductCard";
 import { formatPrice } from "@/lib/utils";
@@ -21,7 +22,7 @@ interface ProductDetailProps {
     shortDescription?: string | null;
     price: number;
     maxQuantity: number;
-    brand?: string | null;
+    brand?: { name: string; slug: string } | null;
     material?: string | null;
     size?: string | null;
     category: { name: string; slug: string };
@@ -153,7 +154,15 @@ export default function ProductDetailClient({ product, related }: ProductDetailP
               <p><span className="text-text-muted">Size:</span> {product.size}</p>
             )}
             {product.brand && (
-              <p><span className="text-text-muted">Brand:</span> {product.brand}</p>
+              <p>
+                <span className="text-text-muted">Brand:</span>{" "}
+                <Link
+                  href={`/brands/${product.brand.slug}`}
+                  className="text-text-dark underline underline-offset-2 hover:text-green-charcoal transition-colors"
+                >
+                  {product.brand.name}
+                </Link>
+              </p>
             )}
             {!product.inStock && (
               <p className="text-red-600">Out of stock</p>

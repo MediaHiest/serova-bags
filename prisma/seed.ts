@@ -27,11 +27,14 @@ const bagImages = [
   "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
 ];
 
+const brands = [{ name: "Selora Brand", slug: "selora-brand" }];
+
 const products = [
   {
     name: "The Linea Genuine Bag",
     slug: "the-linea-genuine-bag",
     categorySlug: "tote-bags",
+    brandSlug: "selora-brand",
     description:
       "A timeless genuine leather tote crafted for the modern woman. Spacious interior with premium finishing and durable handles for everyday elegance.",
     shortDescription: "Premium genuine leather tote for everyday elegance.",
@@ -41,7 +44,6 @@ const products = [
     isPublished: true,
     material: "Genuine Leather",
     color: "Beige",
-    brand: "Selora Brand",
   },
   {
     name: "Classic Beige Tote Bag",
@@ -55,7 +57,7 @@ const products = [
     isPublished: true,
     material: "Vegan Leather",
     color: "Beige",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Black Everyday Crossbody Bag",
@@ -69,7 +71,7 @@ const products = [
     isPublished: true,
     material: "Leather",
     color: "Black",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Mini Evening Clutch",
@@ -83,7 +85,7 @@ const products = [
     isPublished: true,
     material: "Satin",
     color: "Gold",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Brown Structured Tote",
@@ -97,7 +99,7 @@ const products = [
     isPublished: true,
     material: "Leather",
     color: "Brown",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Soft Leather Wallet",
@@ -111,7 +113,7 @@ const products = [
     isPublished: true,
     material: "Leather",
     color: "Tan",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Travel Duffle Bag",
@@ -125,7 +127,7 @@ const products = [
     isPublished: true,
     material: "Canvas & Leather",
     color: "Olive",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Casual Backpack",
@@ -139,7 +141,7 @@ const products = [
     isPublished: true,
     material: "Nylon",
     color: "Black",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Olive Laptop Sleeve",
@@ -154,7 +156,7 @@ const products = [
     material: "Felt & Leather",
     color: "Olive",
     size: "15 inch",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Elegant Shoulder Bag",
@@ -168,7 +170,7 @@ const products = [
     isPublished: true,
     material: "Leather",
     color: "Cream",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Premium Daily Handbag",
@@ -182,7 +184,7 @@ const products = [
     isPublished: true,
     material: "Genuine Leather",
     color: "Black",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
   {
     name: "Modern City Bag",
@@ -196,7 +198,7 @@ const products = [
     isPublished: true,
     material: "Vegan Leather",
     color: "Charcoal",
-    brand: "Selora Brand",
+    brandSlug: "selora-brand",
   },
 ];
 
@@ -211,17 +213,30 @@ async function main() {
     });
   }
 
+  for (const b of brands) {
+    await prisma.brand.upsert({
+      where: { slug: b.slug },
+      update: { name: b.name, isActive: true },
+      create: { ...b, isActive: true },
+    });
+  }
+
   const categoryMap = Object.fromEntries(
     (await prisma.category.findMany()).map((c) => [c.slug, c.id])
+  );
+
+  const brandMap = Object.fromEntries(
+    (await prisma.brand.findMany()).map((b) => [b.slug, b.id])
   );
 
   for (let i = 0; i < products.length; i++) {
     const p = products[i];
     const categoryId = categoryMap[p.categorySlug];
-    if (!categoryId) continue;
+    const brandId = brandMap[p.brandSlug];
+    if (!categoryId || !brandId) continue;
 
-    const { categorySlug, color, ...productData } = p;
-    const data = { ...productData, categoryId };
+    const { categorySlug, brandSlug, color, ...productData } = p;
+    const data = { ...productData, categoryId, brandId };
 
     const product = await prisma.product.upsert({
       where: { slug: p.slug },

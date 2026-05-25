@@ -12,6 +12,7 @@ export default async function ProductPage({ params }: Params) {
     where: { slug, isPublished: true },
     include: {
       category: { select: { name: true, slug: true } },
+      brand: { select: { name: true, slug: true } },
       colors: { orderBy: { sortOrder: "asc" } },
     },
   });
@@ -39,7 +40,9 @@ export default async function ProductPage({ params }: Params) {
         shortDescription: product.shortDescription,
         price: decimalToNumber(product.price),
         maxQuantity: product.stock,
-        brand: product.brand,
+        brand: product.brand
+          ? { name: product.brand.name, slug: product.brand.slug }
+          : null,
         material: product.material,
         size: product.size,
         category: product.category,
