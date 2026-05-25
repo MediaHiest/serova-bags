@@ -56,7 +56,13 @@ export const checkoutSchema = z.object({
 
 export const productColorSchema = z.object({
   name: z.string().min(1, "Color name is required"),
-  imageUrl: z.string().url("Valid image URL is required"),
+  imageUrl: z
+    .string()
+    .min(1, "Image is required")
+    .refine(
+      (val) => val.startsWith("/uploads/") || /^https?:\/\//.test(val),
+      "Upload an image for this color"
+    ),
   sortOrder: z.number().int().optional(),
 });
 

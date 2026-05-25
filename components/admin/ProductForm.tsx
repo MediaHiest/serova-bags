@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { slugify } from "@/lib/utils";
+import ImageUploadField from "@/components/admin/ImageUploadField";
 
 interface Category {
   id: string;
@@ -28,11 +29,11 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(!!productId);
   const [saving, setSaving] = useState(false);
+  const [uploadingCount, setUploadingCount] = useState(0);
   const [error, setError] = useState("");
   const [colors, setColors] = useState<ColorRow[]>([emptyColor()]);
   const [form, setForm] = useState({
     name: "",
-    slug: "",
     description: "",
     shortDescription: "",
     price: "",
@@ -63,7 +64,6 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
           if (p) {
             setForm({
               name: p.name,
-              slug: p.slug,
               description: p.description,
               shortDescription: p.shortDescription ?? "",
               price: String(p.price),
@@ -90,14 +90,6 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
     }
   }, [productId]);
 
-  function handleNameChange(name: string) {
-    setForm((prev) => ({
-      ...prev,
-      name,
-      slug: prev.slug || slugify(name),
-    }));
-  }
-
   function updateColor(index: number, field: keyof ColorRow, value: string) {
     setColors((prev) => prev.map((c, i) => (i === index ? { ...c, [field]: value } : c)));
   }
@@ -110,6 +102,10 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
     setColors((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)));
   }
 
+  function setColorUploading(active: boolean) {
+    setUploadingCount((count) => Math.max(0, count + (active ? 1 : -1)));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -117,14 +113,20 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
 
     const validColors = colors.filter((c) => c.name.trim() && c.imageUrl.trim());
     if (validColors.length === 0) {
-      setError("Add at least one color with name and image URL");
+      setError("Add at least one color with a name and uploaded image");
+      setSaving(false);
+      return;
+    }
+
+    if (uploadingCount > 0) {
+      setError("Wait for image uploads to finish");
       setSaving(false);
       return;
     }
 
     const payload = {
       name: form.name,
-      slug: form.slug,
+      slug: slugify(form.name),
       description: form.description,
       shortDescription: form.shortDescription || undefined,
       price: parseFloat(form.price),
@@ -174,9 +176,19 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
       </h1>
 
       <form onSubmit={handleSubmit} className="admin-card max-w-2xl space-y-4">
-        <div className="grid md:grid-cols-2 gap-4">
-          <input className="input-field" placeholder="Name" value={form.name} onChange={(e) => handleNameChange(e.target.value)} required />
-          <input className="input-field" placeholder="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
+        <div>
+          <input
+            className="input-field"
+            placeholder="Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+          {form.name.trim() && (
+            <p className="text-xs text-text-muted mt-1.5">
+              URL slug: <span className="text-text-dark">{slugify(form.name)}</span>
+            </p>
+          )}
         </div>
         <textarea className="input-field min-h-24" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
         <input className="input-field" placeholder="Short Description" value={form.shortDescription} onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} />
@@ -208,28 +220,36 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
               + Add color
             </button>
           </div>
-          <p className="text-xs text-text-muted">Each color needs a name and image URL shown when customers select it.</p>
+          <p className="text-xs text-text-muted">
+            Each color needs a name and an uploaded image shown when customers select it.
+          </p>
           {colors.map((color, index) => (
-            <div key={index} className="grid md:grid-cols-[1fr_2fr_auto] gap-3 items-start p-3 rounded-lg border border-text-dark/10">
-              <input
-                className="input-field"
-                placeholder="Color name (e.g. Beige)"
-                value={color.name}
-                onChange={(e) => updateColor(index, "name", e.target.value)}
-                required
-              />
-              <input
-                className="input-field"
-                placeholder="Image URL"
+            <div
+              key={index}
+              className="grid md:grid-cols-[1fr_1.5fr_auto] gap-4 items-start p-4 rounded-lg border border-text-dark/10"
+            >
+              <div>
+                <label className="input-label">Color name</label>
+                <input
+                  className="input-field"
+                  placeholder="e.g. Beige"
+                  value={color.name}
+                  onChange={(e) => updateColor(index, "name", e.target.value)}
+                  required
+                />
+              </div>
+              <ImageUploadField
+                label="Color image"
                 value={color.imageUrl}
-                onChange={(e) => updateColor(index, "imageUrl", e.target.value)}
-                required
+                onChange={(url) => updateColor(index, "imageUrl", url)}
+                onUploadStateChange={setColorUploading}
+                onError={(message) => setError(message)}
               />
               {colors.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeColor(index)}
-                  className="text-xs text-red-600 underline px-2 py-3"
+                  className="text-xs text-red-600 underline px-2 py-3 md:mt-7"
                 >
                   Remove
                 </button>
@@ -249,8 +269,12 @@ export default function ProductFormPage({ productId }: { productId?: string }) {
           </label>
         </div>
         {error && <p className="text-red-600 text-sm">{error}</p>}
-        <button type="submit" disabled={saving} className="btn-primary disabled:opacity-50">
-          {saving ? "Saving..." : "Save Product"}
+        <button
+          type="submit"
+          disabled={saving || uploadingCount > 0}
+          className="btn-primary disabled:opacity-50"
+        >
+          {saving ? "Saving..." : uploadingCount > 0 ? "Uploading images…" : "Save Product"}
         </button>
       </form>
     </div>
