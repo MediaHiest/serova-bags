@@ -40,5 +40,12 @@
     "tailwindcss": "^4",
     "tsx": "^4.22.3",
     "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.3.0",
+    "@tailwindcss/oxide-linux-x64-musl": "^4.3.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }
