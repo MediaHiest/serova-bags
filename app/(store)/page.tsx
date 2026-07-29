@@ -30,11 +30,31 @@ async function getCategories() {
   });
 }
 
+async function withFallback<T>(query: Promise<T>, fallback: T) {
+  let timeout: ReturnType<typeof setTimeout>;
+
+  const guardedQuery = query.catch((error) => {
+    console.error("Homepage data query failed", error);
+    return fallback;
+  });
+
+  const fallbackQuery = new Promise<T>((resolve) => {
+    timeout = setTimeout(() => {
+      console.error("Homepage data query timed out");
+      resolve(fallback);
+    }, 2500);
+  });
+
+  return Promise.race([guardedQuery, fallbackQuery]).finally(() => {
+    clearTimeout(timeout);
+  });
+}
+
 export default async function HomePage() {
   const [featured, newArrivals, categories] = await Promise.all([
-    getFeaturedProducts(),
-    getNewArrivals(),
-    getCategories(),
+    withFallback(getFeaturedProducts(), []),
+    withFallback(getNewArrivals(), []),
+    withFallback(getCategories(), []),
   ]);
 
   const mapProduct = (p: Awaited<ReturnType<typeof getFeaturedProducts>>[0]) => ({
